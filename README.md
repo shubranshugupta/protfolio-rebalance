@@ -38,7 +38,7 @@ Traditional rebalancing involves selling high-performing assets to buy low-perfo
 
     ```bash
     git clone https://github.com/shubranshugupta/protfolio-rebalance.git
-    cd sip-rebalancer
+    cd protfolio-rebalance
     ```
 
 2. **Install Dependencies**
