@@ -4,6 +4,7 @@ import App from './App';
 // --- Mocks ---
 
 // Mock window.alert since it's not implemented in the test environment
+var window = global.window;
 window.alert = jest.fn();
 
 // Mock LocalStorage
