@@ -1,70 +1,110 @@
-# Getting Started with Create React App
+# 📈 SIP Smart Rebalancer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![MUI](https://img.shields.io/badge/MUI-%230081CB.svg?style=for-the-badge&logo=mui&logoColor=white)
+![Jest](https://img.shields.io/badge/-Jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
 
-## Available Scripts
+A smart financial tool built with **React** and **Material UI** that helps investors maintain their desired mutual fund asset allocation using **Inflow Rebalancing** (adjusting the SIP amount) rather than selling assets.
 
-In the project directory, you can run:
+## 🚀 Why this tool?
 
-### `npm start`
+Traditional rebalancing involves selling high-performing assets to buy low-performing ones. This triggers **Capital Gains Tax** and **Exit Loads**.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+**SIP Smart Rebalancer** solves this by calculating exactly how to split your *next* monthly investment (SIP) to naturally correct portfolio imbalances.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* **Zero Tax:** No units are sold.
+* **Buy Low:** Automatically allocates more money to underperforming funds.
+* **Automated Math:** Handles the complex weighted average calculations instantly.
 
-### `npm test`
+## ✨ Key Features
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **Inflow Rebalancing Algorithm:** mathematically distributes your SIP to close the gap between *Current Allocation* and *Target Allocation*.
+* **Material UI Design:** Clean, modern interface with responsive grid layouts.
+* **Dark/Light Mode:** Native theme toggling with persistent state.
+* **Data Persistence:** Uses `localStorage` to save your portfolio details (Funds, Targets, SIP Amount) so you don't have to re-enter them every month.
+* **XIRR Tracking:** Visual input to track the performance of individual funds alongside their allocation.
+* **Portfolio Health:** Visual indicators when Target % does not equal 100%.
 
-### `npm run build`
+## 🛠️ Tech Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* **Frontend:** React.js (Hooks: `useState`, `useEffect`, `useMemo`)
+* **UI Library:** Material UI (MUI v6) + Emotion
+* **Testing:** Jest & React Testing Library
+* **Icons:** MUI Icons Material
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ⚙️ Installation & Setup
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Clone the repository**
 
-### `npm run eject`
+    ```bash
+    git clone [https://github.com/yourusername/sip-rebalancer.git](https://github.com/yourusername/sip-rebalancer.git)
+    cd sip-rebalancer
+    ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. **Install Dependencies**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    ```bash
+    npm install
+    # Installs React, MUI, and Testing libraries
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. **Run the App**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+    ```bash
+    npm start
+    ```
 
-## Learn More
+    Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🧪 Running Tests
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project includes a robust test suite covering rendering, calculations, accessibility, and local storage logic.
 
-### Code Splitting
+```bash
+npm test
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+**What is tested?**
 
-### Analyzing the Bundle Size
+* **UI Rendering:** Checks if inputs and buttons appear correctly.
+* **Logic:** Verifies that SIP allocation math is accurate.
+* **Persistence:** Ensures data is saved to LocalStorage.
+* **Interaction:** Simulates adding/deleting funds and toggling themes.
+* **Accessibility:** Checks for ARIA labels on interactive elements.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📐 How the Algorithm Works
 
-### Making a Progressive Web App
+1. **Calculate Future Total:** `Current Portfolio Value + New SIP Amount`
+2. **Determine Ideal Value:** `Future Total * Target %` for each fund.
+3. **Find the Deficit:** `Ideal Value - Current Value`.
+   * *If Deficit > 0*: The fund is lagging (Needs money).
+   * *If Deficit < 0*: The fund is overweight (Needs no money).
+4. **Weighted Distribution:** The SIP amount is distributed proportionally to the funds with the largest deficits.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 📁 Project Structure
 
-### Advanced Configuration
+```plain text
+/src
+  ├── App.js           # Main Component (Logic & UI)
+  ├── App.test.js      # Unit & Integration Tests
+  ├── index.js         # Entry Point
+  └── ...
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 📝 Usage Guide
 
-### Deployment
+1. **Set SIP Amount:** Enter the total amount you want to invest this month (e.g., ₹18,000).
+2. **Add Funds:** Click "Add Fund" to list your mutual funds.
+3. **Enter Details:**
+   * *Value*: Current market value of the fund.
+   * *Target*: Desired portfolio percentage (e.g., 40%).
+4. **Calculate:** Click the button. The table will show exactly how much to invest in each fund.
+5. **Save:** Click "Save Data" to remember your setup for next month.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🤝 Contributing
 
-### `npm run build` fails to minify
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📄 License
+
+This project is open source and available under the [MIT License](/LICENSE).
