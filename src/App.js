@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   ThemeProvider, createTheme, CssBaseline, 
   Container, Paper, Typography, TextField, Button, 
   IconButton, Grid, InputAdornment, Table, 
   TableBody, TableCell, TableContainer, TableHead, TableRow, 
-  Box, Stack, Chip, Avatar
+  Box, Stack, Chip, Avatar, useMediaQuery
 } from '@mui/material';
 
 // Icons
@@ -18,7 +18,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 function App() {
   // --- STATE ---
-  const [mode, setMode] = useState('dark');
+  const [mode, setMode] = useState('light');
   const [sipAmount, setSipAmount] = useState(20000);
   const [funds, setFunds] = useState([
     { id: 1, name: "Small Cap Fund", value: 0, xirr: 15, target: 40 },
@@ -27,37 +27,52 @@ function App() {
   ]);
   const [results, setResults] = useState(null);
 
-  // --- THEME CONFIGURATION ---
+  // --- RESPONSIVE THEME ---
   const theme = useMemo(
     () =>
       createTheme({
+        breakpoints: {
+          values: { xs: 0, sm: 600, md: 960, lg: 1280, xl: 1920 },
+        },
         palette: {
           mode,
-          primary: { main: mode === 'light' ? '#2563eb' : '#a4bbecff' },
+          primary: { main: '#2563eb' },
           secondary: { main: '#64748b' },
           background: {
-            default: mode === 'light' ? '#f1f5f9' : '#0f172a',
+            default: mode === 'light' ? '#f8fafc' : '#0f172a',
             paper: mode === 'light' ? '#ffffff' : '#1e293b',
           },
         },
         typography: {
           fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-          h4: { fontWeight: 700 },
+          h4: { 
+            fontWeight: 700,
+            // Responsive font size
+            '@media (max-width:600px)': { fontSize: '1.5rem' },
+          },
+        },
+        components: {
+          MuiTextField: {
+            styleOverrides: {
+              root: { backgroundColor: mode === 'light' ? '#fff' : 'transparent' }
+            }
+          }
         },
         shape: { borderRadius: 12 },
       }),
     [mode],
   );
 
-  // --- INITIAL LOAD & SAVE ---
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // --- LOAD & SAVE ---
   useEffect(() => {
     const savedMode = localStorage.getItem('themeMode') || 'light';
     setMode(savedMode);
-
     const savedFunds = localStorage.getItem('myFunds');
     const savedSip = localStorage.getItem('sipAmount');
     if (savedFunds) setFunds(JSON.parse(savedFunds));
-    if (savedSip) setSipAmount(Number.parseFloat(savedSip));
+    if (savedSip) setSipAmount(parseFloat(savedSip));
   }, []);
 
   const handleSave = () => {
@@ -72,10 +87,10 @@ function App() {
     localStorage.setItem('themeMode', newMode);
   };
 
-  // --- HANDLERS ---
+  // --- LOGIC HANDLERS ---
   const updateFund = (index, field, val) => {
     const newFunds = [...funds];
-    newFunds[index][field] = field === 'name' ? val : (Number.parseFloat(val) || 0);
+    newFunds[index][field] = field === 'name' ? val : (parseFloat(val) || 0);
     setFunds(newFunds);
   };
 
@@ -87,11 +102,9 @@ function App() {
     setFunds(funds.filter((_, i) => i !== index));
   };
 
-  // --- CALCULATIONS ---
-  const totalTarget = funds.reduce((sum, f) => sum + (Number.parseFloat(f.target) || 0), 0);
-  
-  const currentTotalValue = funds.reduce((sum, f) => sum + (Number.parseFloat(f.value) || 0), 0);
-  
+  // --- CALCULATION LOGIC ---
+  const totalTarget = funds.reduce((sum, f) => sum + (parseFloat(f.target) || 0), 0);
+  const currentTotalValue = funds.reduce((sum, f) => sum + (parseFloat(f.value) || 0), 0);
   const weightedXirr = currentTotalValue > 0 
     ? (funds.reduce((sum, f) => sum + (f.value * f.xirr), 0) / currentTotalValue).toFixed(2)
     : 0;
@@ -101,7 +114,6 @@ function App() {
       alert(`Total target must be 100%. Current: ${totalTarget}%`);
       return;
     }
-
     const projectedTotal = currentTotalValue + sipAmount;
     let totalDeficit = 0;
 
@@ -121,12 +133,10 @@ function App() {
       } else {
         investAmount = sipAmount * (fund.target / 100);
       }
-      
       totalAllocated += investAmount;
       const currentPct = currentTotalValue > 0 
         ? ((fund.value / currentTotalValue) * 100).toFixed(1) 
         : 0;
-
       return { ...fund, currentPct, investAmount: Math.round(investAmount) };
     });
 
@@ -136,12 +146,12 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 3, px: isMobile ? 2 : 3 }}>
         
         {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <AccountBalanceWalletIcon color="primary" sx={{ fontSize: 40 }} />
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <AccountBalanceWalletIcon color="primary" sx={{ fontSize: isMobile ? 32 : 40 }} />
             <Box>
               <Typography variant="h4" color="text.primary">SIP Rebalancer</Typography>
               <Typography variant="body2" color="text.secondary">Smart Inflow Allocation</Typography>
@@ -153,155 +163,182 @@ function App() {
         </Box>
 
         {/* MAIN INPUT CARD */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+        <Paper elevation={3} sx={{ p: isMobile ? 2 : 3, mb: 4 }}>
           
-          {/* SIP Amount Input */}
+          {/* SIP Input */}
           <TextField
             label="Monthly SIP Amount"
             type="number"
             value={sipAmount}
-            onChange={(e) => setSipAmount(Number.parseFloat(e.target.value) || 0)}
+            onChange={(e) => setSipAmount(parseFloat(e.target.value) || 0)}
             fullWidth
             slotProps={{
-              input: {
-                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-              }
+              input: { startAdornment: <InputAdornment position="start">₹</InputAdornment> }
             }}
-            sx={{ mb: 4, maxWidth: 300 }}
+            sx={{ mb: 3, maxWidth: isMobile ? '100%' : 300 }}
           />
 
-          {/* Fund Inputs List */}
+          {/* FUND ROWS (Responsive Grid) */}
           <Stack spacing={2}>
             {funds.map((fund, index) => (
-              <Grid container spacing={2} alignItems="center" key={fund.id}>
-                
-                {/* Serial No */}
-                <Grid item xs={1}>
-                  <Avatar 
-                    sx={{ 
-                      width: 28, height: 28, fontSize: '0.9rem', 
-                      bgcolor: 'action.selected', color: 'text.primary' 
-                    }}
-                  >
-                    {index + 1}
-                  </Avatar>
-                </Grid>
+              <Paper 
+                key={fund.id} 
+                variant="outlined" 
+                sx={{ 
+                  p: 2, 
+                  bgcolor: theme.palette.mode === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)',
+                  borderColor: 'divider'
+                }}
+              >
+                <Grid container spacing={2} alignItems="center">
+                  
+                  {/* MOBILE HEADER: Serial + Name + Delete */}
+                  <Grid item size={{ xs: 12, sm: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box display="flex" alignItems="center" gap={2} width="100%" justifyContent="center">
+                      <Avatar 
+                        sx={{ 
+                          width: 24, height: 24, fontSize: '0.8rem', 
+                          bgcolor: 'primary.main', color: 'white' 
+                        }}
+                      >
+                        {index + 1}
+                      </Avatar>
+                      {/* Show Delete Icon ONLY on Mobile here for better UX */}
+                      {isMobile && (
+                        <IconButton 
+                          size="small" 
+                          color="error" 
+                          onClick={() => removeFund(index)}
+                          aria-label="delete fund"
+                          sx={{ marginLeft: "auto" }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </Grid>
 
-                {/* Name */}
-                <Grid item xs={12} sm={4}>
-                  <TextField 
-                    label="Fund Name" 
-                    variant="outlined" 
-                    size="small" 
-                    fullWidth
-                    value={fund.name}
-                    onChange={(e) => updateFund(index, 'name', e.target.value)}
-                  />
-                </Grid>
+                  {/* Fund Name */}
+                  <Grid item size={{ xs: 12, sm: 3 }} >
+                    <TextField 
+                      label="Fund Name" 
+                      variant="outlined" 
+                      size="small" 
+                      fullWidth
+                      value={fund.name}
+                      onChange={(e) => updateFund(index, 'name', e.target.value)}
+                    />
+                  </Grid>
 
-                {/* Value */}
-                <Grid item xs={6} sm={2.5}>
-                  <TextField 
-                    label="Value" 
-                    type="number" 
-                    size="small" 
-                    fullWidth
-                    value={fund.value}
-                    onChange={(e) => updateFund(index, 'value', e.target.value)}
-                    slotProps={{
-                      input: {
-                        startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                      }
-                    }}
-                  />
-                </Grid>
+                  {/* Value */}
+                  <Grid item size={{ xs: 12, sm: 3 }}>
+                    <TextField 
+                      label="Current Value" 
+                      type="number" 
+                      size="small" 
+                      fullWidth
+                      value={fund.value}
+                      onChange={(e) => updateFund(index, 'value', e.target.value)}
+                      slotProps={{
+                        input: { startAdornment: <InputAdornment position="start">₹</InputAdornment> }
+                      }}
+                    />
+                  </Grid>
 
-                {/* XIRR */}
-                <Grid item xs={6} sm={2}>
-                  <TextField 
-                    label="XIRR" 
-                    type="number" 
-                    size="small" 
-                    fullWidth
-                    value={fund.xirr}
-                    onChange={(e) => updateFund(index, 'xirr', e.target.value)}
-                    slotProps={{
-                      input: {
-                        endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                      }
-                    }}
-                  />
-                </Grid>
+                  {/* XIRR & Target (Split 50-50 on mobile) */}
+                  <Grid item size={{ xs: 12, sm: 2 }}>
+                    <TextField 
+                      label="XIRR" 
+                      type="number" 
+                      size="small" 
+                      fullWidth
+                      value={fund.xirr}
+                      onChange={(e) => updateFund(index, 'xirr', e.target.value)}
+                      slotProps={{
+                        input: { endAdornment: <InputAdornment position="end">%</InputAdornment> }
+                      }}
+                    />
+                  </Grid>
 
-                {/* Target */}
-                <Grid item xs={6} sm={2}>
-                  <TextField 
-                    label="Target" 
-                    type="number" 
-                    size="small" 
-                    fullWidth
-                    value={fund.target}
-                    onChange={(e) => updateFund(index, 'target', e.target.value)}
-                    error={totalTarget > 100}
-                    slotProps={{
-                      input: {
-                        endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                      }
-                    }}
-                  />
-                </Grid>
+                  <Grid item size={{ xs: 12, sm: 2 }}>
+                    <TextField 
+                      label="Target" 
+                      type="number" 
+                      size="small" 
+                      fullWidth
+                      value={fund.target}
+                      onChange={(e) => updateFund(index, 'target', e.target.value)}
+                      error={totalTarget > 100}
+                      slotProps={{
+                        input: { endAdornment: <InputAdornment position="end">%</InputAdornment> }
+                      }}
+                    />
+                  </Grid>
 
-                {/* Delete */}
-                <Grid item xs={6} sm={0.5}>
-                  <IconButton color="error" onClick={() => removeFund(index)} aria-label="delete fund">
-                    <DeleteIcon />
-                  </IconButton>
+                  {/* Desktop Delete Button (Hidden on Mobile) */}
+                  {!isMobile && (
+                    <Grid item sm={1} display="flex" justifyContent="center">
+                      <IconButton color="error" onClick={() => removeFund(index)} aria-label="delete fund">
+                        <DeleteIcon />
+                      </IconButton>
+                    </Grid>
+                  )}
                 </Grid>
-              </Grid>
+              </Paper>
             ))}
           </Stack>
 
-          {/* Action Buttons */}
+          {/* ACTION BUTTONS */}
           <Stack 
             direction={{ xs: 'column', sm: 'row' }} 
             spacing={2} 
             sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider' }}
             alignItems="center"
           >
-            <Button startIcon={<AddCircleIcon />} onClick={addFund}>
+            <Button 
+              variant="outlined" 
+              startIcon={<AddCircleIcon />} 
+              onClick={addFund}
+              fullWidth={isMobile}
+              sx={{ minWidth: 150 }}
+            >
               Add Fund
             </Button>
             
-            <Box flexGrow={1} textAlign={{ xs: 'center', sm: 'right' }}>
+            <Box flexGrow={1} textAlign={{ xs: 'center', sm: 'right' }} width="100%">
               <Typography variant="body2" color={totalTarget === 100 ? "success.main" : "error.main"} fontWeight="bold">
                 Total Target: {totalTarget}%
               </Typography>
             </Box>
 
-            <Button 
-              variant="outlined" 
-              startIcon={<SaveIcon />} 
-              onClick={handleSave}
-              color="warning"
-            >
-              Save Data
-            </Button>
+            <Box display="flex" gap={2} width={isMobile ? "100%" : "auto"}>
+              <Button 
+                variant="outlined" 
+                startIcon={<SaveIcon />} 
+                onClick={handleSave}
+                color="warning"
+                fullWidth={isMobile}
+              >
+                Save
+              </Button>
 
-            <Button 
-              variant="contained" 
-              startIcon={<CalculateIcon />} 
-              onClick={handleCalculate}
-              size="large"
-            >
-              Calculate
-            </Button>
+              <Button 
+                variant="contained" 
+                startIcon={<CalculateIcon />} 
+                onClick={handleCalculate}
+                size="large"
+                fullWidth={isMobile}
+              >
+                Calculate
+              </Button>
+            </Box>
           </Stack>
         </Paper>
 
-        {/* RESULTS SECTION */}
+        {/* RESULTS TABLE */}
         {results && (
           <Paper elevation={3} sx={{ overflow: 'hidden' }}>
-            <Box sx={{ p: 2, bgcolor: 'action.hover', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ p: 2, bgcolor: 'action.hover', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: 1 }}>
               <Typography variant="h6">Allocation Plan</Typography>
               <Chip 
                 label={`Portfolio Avg XIRR: ${weightedXirr}%`} 
@@ -311,24 +348,33 @@ function App() {
               />
             </Box>
             
-            <TableContainer>
-              <Table>
+            {/* Responsive Table Container */}
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table stickyHeader size={isMobile ? "small" : "medium"}>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>#</strong></TableCell>
-                    <TableCell><strong>Fund Name</strong></TableCell>
-                    <TableCell align="right"><strong>Current %</strong></TableCell>
-                    <TableCell align="right"><strong>XIRR</strong></TableCell>
-                    <TableCell align="right"><strong>Invest This Amount</strong></TableCell>
+                    <TableCell>#</TableCell>
+                    <TableCell>Fund Name</TableCell>
+                    {!isMobile && <TableCell align="right">Current %</TableCell>} 
+                    {!isMobile && <TableCell align="right">XIRR</TableCell>}
+                    <TableCell align="right"><strong>Invest</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {results.data.map((row, index) => (
                     <TableRow key={row.id} hover>
                       <TableCell>{index + 1}</TableCell>
-                      <TableCell component="th" scope="row">{row.name}</TableCell>
-                      <TableCell align="right">{row.currentPct}%</TableCell>
-                      <TableCell align="right">{row.xirr}%</TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.name}
+                        {/* On mobile, show the details under the name since we hide columns */}
+                        {isMobile && (
+                          <Typography variant="caption" display="block" color="text.secondary">
+                             {row.currentPct}% portfolio • {row.xirr}% XIRR
+                          </Typography>
+                        )}
+                      </TableCell>
+                      {!isMobile && <TableCell align="right">{row.currentPct}%</TableCell>}
+                      {!isMobile && <TableCell align="right">{row.xirr}%</TableCell>}
                       <TableCell align="right">
                         <Typography color="primary.main" fontWeight="bold">
                           ₹ {row.investAmount.toLocaleString()}
@@ -337,9 +383,9 @@ function App() {
                     </TableRow>
                   ))}
                   <TableRow sx={{ bgcolor: 'action.selected' }}>
-                    <TableCell colSpan={4} align="right"><strong>Total Investment:</strong></TableCell>
+                    <TableCell colSpan={isMobile ? 2 : 4} align="right"><strong>Total:</strong></TableCell>
                     <TableCell align="right">
-                      <Typography variant="h6" color="success.main">
+                      <Typography variant="h6" color="success.main" fontSize={isMobile ? '1rem' : '1.25rem'}>
                         ₹ {results.total.toLocaleString()}
                       </Typography>
                     </TableCell>
@@ -349,7 +395,6 @@ function App() {
             </TableContainer>
           </Paper>
         )}
-
       </Container>
     </ThemeProvider>
   );
