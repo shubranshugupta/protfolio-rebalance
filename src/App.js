@@ -193,7 +193,7 @@ function App() {
                 <Grid container spacing={2} alignItems="center">
                   
                   {/* MOBILE HEADER: Serial + Name + Delete */}
-                  <Grid item size={{ xs: 12, sm: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Grid size={{ xs: 12, sm: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box display="flex" alignItems="center" gap={2} width="100%" justifyContent="center">
                       <Avatar 
                         sx={{ 
@@ -219,7 +219,7 @@ function App() {
                   </Grid>
 
                   {/* Fund Name */}
-                  <Grid item size={{ xs: 12, sm: 3 }} >
+                  <Grid size={{ xs: 12, sm: 3 }} >
                     <TextField 
                       label="Fund Name" 
                       variant="outlined" 
@@ -231,7 +231,7 @@ function App() {
                   </Grid>
 
                   {/* Value */}
-                  <Grid item size={{ xs: 12, sm: 3 }}>
+                  <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField 
                       label="Current Value" 
                       type="number" 
@@ -246,7 +246,7 @@ function App() {
                   </Grid>
 
                   {/* XIRR & Target (Split 50-50 on mobile) */}
-                  <Grid item size={{ xs: 12, sm: 2 }}>
+                  <Grid size={{ xs: 12, sm: 2 }}>
                     <TextField 
                       label="XIRR" 
                       type="number" 
@@ -260,7 +260,7 @@ function App() {
                     />
                   </Grid>
 
-                  <Grid item size={{ xs: 12, sm: 2 }}>
+                  <Grid size={{ xs: 12, sm: 2 }}>
                     <TextField 
                       label="Target" 
                       type="number" 
@@ -277,7 +277,7 @@ function App() {
 
                   {/* Desktop Delete Button (Hidden on Mobile) */}
                   {!isMobile && (
-                    <Grid item sm={1} display="flex" justifyContent="center">
+                    <Grid size={{ sm:1 }} display="flex" justifyContent="center">
                       <IconButton color="error" onClick={() => removeFund(index)} aria-label="delete fund">
                         <DeleteIcon />
                       </IconButton>
@@ -342,9 +342,10 @@ function App() {
               <Typography variant="h6">Allocation Plan</Typography>
               <Chip 
                 label={`Portfolio Avg XIRR: ${weightedXirr}%`} 
-                color="primary" 
+                color={parseFloat(weightedXirr) >= 0 ? "success" : "error"}
                 variant="outlined" 
                 size="small"
+                sx={{ fontWeight: 'bold' }}
               />
             </Box>
             
@@ -369,7 +370,7 @@ function App() {
                         {/* On mobile, show the details under the name since we hide columns */}
                         {isMobile && (
                           <Typography variant="caption" display="block" color="text.secondary">
-                             {row.currentPct}% portfolio • {row.xirr}% XIRR
+                             • {row.currentPct}% portfolio <br/>• {row.xirr}% XIRR
                           </Typography>
                         )}
                       </TableCell>
