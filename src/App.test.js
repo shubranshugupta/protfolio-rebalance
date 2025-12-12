@@ -53,7 +53,7 @@ describe('SIP Rebalancer App', () => {
     // Let's rely on finding inputs to modify the default funds instead of deleting
 
     const names = screen.getAllByLabelText(/Fund Name/i);
-    const values = screen.getAllByLabelText(/^Value$/i); // Exact match
+    const values = screen.getAllByLabelText(/^Current Value$/i); // Exact match
     const targets = screen.getAllByLabelText(/^Target$/i);
 
     // Modify Fund 1: Value 0, Target 50%
@@ -138,7 +138,7 @@ describe('SIP Rebalancer App', () => {
   test('saves and loads from localStorage', () => {
     render(<App />);
 
-    const saveButton = screen.getByText(/Save Data/i);
+    const saveButton = screen.getByText(/Save/i);
     const sipInput = screen.getByLabelText(/Monthly SIP Amount/i);
 
     // Change SIP
