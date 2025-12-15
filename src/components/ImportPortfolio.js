@@ -100,11 +100,23 @@ const ImportPortfolio = ({ funds, setFunds, isMobile }) => {
                     onClose={handleMenuClose}
                 >
                     <MenuItem onClick={() => triggerFileSelect('groww')}>
-                        <ListItemIcon><TrendingUpIcon fontSize="small" color="success" /></ListItemIcon>
+                        <ListItemIcon sx={{ mR: 1 }}>
+                            <img 
+                                src="/groww.png"
+                                alt="Groww" 
+                                style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
+                            />
+                        </ListItemIcon>
                         <ListItemText>Groww</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={() => triggerFileSelect('zerodha')} disabled>
-                        <ListItemIcon><TrendingUpIcon fontSize="small" style={{ color: '#ff5722' }} /></ListItemIcon>
+                        <ListItemIcon>
+                            <img 
+                                src="/zerodha-kite.png"
+                                alt="zerodha" 
+                                style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
+                            />
+                        </ListItemIcon>
                         <ListItemText>Zerodha (Kite)</ListItemText>
                     </MenuItem>
                 </Menu>
