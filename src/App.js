@@ -18,6 +18,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 import AllocationPieChart from './components/AllocationPieChart';
 import ResultTable from './components/ResultTable';
+import ImportPortfolio from './components/ImportPortfolio';
 
 function App() {
     // --- STATE ---
@@ -210,18 +211,27 @@ function App() {
                 {/* MAIN INPUT CARD */}
                 <Paper elevation={3} sx={{ p: isMobile ? 2 : 3, mb: 4 }}>
 
-                    {/* SIP Input */}
-                    <TextField
-                        label="Monthly SIP Amount"
-                        type="number"
-                        value={sipAmount}
-                        onChange={(e) => setSipAmount(parseFloat(e.target.value) || 0)}
-                        fullWidth
-                        slotProps={{
-                            input: { startAdornment: <InputAdornment position="start">₹</InputAdornment> }
-                        }}
-                        sx={{ maxWidth: isMobile ? '100%' : 300, mb: 3 }}
-                    />
+                    <Stack 
+                        spacing={2} 
+                        direction={{ xs: 'column', sm: 'row' }} 
+                        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider', pb: 2}}
+                        justifyContent="space-between"
+                    >
+                        {/* SIP Input */}
+                        <TextField
+                            label="Monthly SIP Amount"
+                            type="number"
+                            value={sipAmount}
+                            onChange={(e) => setSipAmount(parseFloat(e.target.value) || 0)}
+                            fullWidth
+                            slotProps={{
+                                input: { startAdornment: <InputAdornment position="start">₹</InputAdornment> }
+                            }}
+                            sx={{ maxWidth: isMobile ? '100%' : 300, mb: 3 }}
+                        />
+
+                        <ImportPortfolio funds={funds} setFunds={setFunds} isMobile={isMobile} />
+                    </Stack>
 
                     {/* FUND ROWS (Responsive Grid) */}
                     <Stack spacing={2}>
