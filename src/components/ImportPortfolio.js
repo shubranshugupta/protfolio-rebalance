@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Menu, MenuItem, ListItemIcon, 
     ListItemText, Box, Button, Alert, Modal } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'; 
 import { parseGrowwFile } from '../utils/growwParser';
 
 const ImportPortfolio = ({ funds, setFunds, isMobile }) => {
