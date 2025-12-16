@@ -90,6 +90,8 @@ function App() {
         localStorage.setItem('myFunds', JSON.stringify(funds));
         localStorage.setItem('sipAmount', sipAmount);
 
+        alert("Data saved successfully!");
+
         const dataToExport = {
             sipAmount,
             funds,
@@ -106,8 +108,6 @@ function App() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
-        alert("Data saved successfully!");
     };
 
     const handleImport = (event) => {
