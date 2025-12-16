@@ -7,6 +7,8 @@ import App from './App';
 var window = global.window;
 window.alert = jest.fn();
 
+global.URL.createObjectURL = jest.fn();
+
 // Mock LocalStorage
 const localStorageMock = (function () {
     let store = {};
@@ -136,6 +138,8 @@ describe('SIP Rebalancer App', () => {
     });
 
     test('saves and loads from localStorage', () => {
+        const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+        
         render(<App />);
 
         const saveButton = screen.getByText(/Save/i);

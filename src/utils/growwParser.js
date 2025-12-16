@@ -64,7 +64,7 @@ const processRawData = (rows) => {
   let headerIndex = -1;
   for (let i = 0; i < rows.length; i++) {
     const rowStr = JSON.stringify(rows[i]);
-    if (rowStr.includes("Scheme Name") && rowStr.includes("Current Value")) {
+    if (rowStr.includes("Scheme Name")) {
       headerIndex = i;
       break;
     }
